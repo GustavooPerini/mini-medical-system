@@ -1,0 +1,56 @@
+services:
+  database:
+    image: mysql
+    container_name: mini-medical-system-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: medical-system
+    ports:
+      - 3306:3306
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysql",
+          "-h",
+          "localhost",
+          "-P",
+          "3306",
+          "-u",
+          "root",
+          "--password=root",
+          "-e",
+          "select 1",
+          "medical-system",
+        ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: mini-medical-system-phpmyadmin
+    ports:
+      - 8888:80
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      PMA_HOST: database
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
+      UPLOAD_LIMIT: 300M
+
+  frontend:
+    image: java_21_node_24
+    container_name: mini-medical-system-backfront
+    ports:
+      - 8080:8080
+      - 4200:4200
+    build:
+      context: ./back-front
+      dockerfile: Dockerfile
+    volumes:
+      - ../frontend/:/app/mini-medical-system-frontend
+      - ../backend/:/app/mini-medical-system-backend
+    stdin_open: true
