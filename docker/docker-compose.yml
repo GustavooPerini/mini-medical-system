@@ -41,7 +41,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       UPLOAD_LIMIT: 300M
 
-  frontend:
+  workspace:
     image: java_21_node_24
     container_name: mini-medical-system-backfront
     ports:
